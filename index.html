@@ -490,16 +490,6 @@ select option { font-family: sans-serif; }
   </div>
 </div>
 
-<div class="card">
-  <div class="card-header"><h2>Albero genealogico</h2><span class="badge badge-gray" id="personeCnt">0 persone</span></div>
-  <div class="card-body">
-    <div id="personeList"><div class="empty-state">Nessuna persona aggiunta.</div></div>
-    <div class="btn-row" style="margin-top:8px">
-      <button class="btn-danger-sm" onclick="clearAll()">Svuota tutto</button>
-    </div>
-  </div>
-</div>
-
 </div><!-- fine sinistra -->
 
 <!-- ===== DESTRA ===== -->
@@ -514,17 +504,13 @@ select option { font-family: sans-serif; }
     <div class="vp" id="valPanel"><div class="vh empty">In attesa di dati</div></div>
   </div>
 </div>
-
 <div class="card">
-  <div class="card-header"><h2>Importa da testo</h2><span class="badge badge-yellow">PARSER</span></div>
+  <div class="card-header"><h2>Albero genealogico</h2><span class="badge badge-gray" id="personeCnt">0 persone</span></div>
   <div class="card-body">
-    <p class="parser-hint">Incolla un template <code>{{Discendenza}}</code> esistente per importarne la struttura.</p>
-    <div class="fg"><textarea id="parserInput" rows="7"></textarea></div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="parseInput()">Importa</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('parserInput').value=''">Svuota</button>
+    <div id="personeList"><div class="empty-state">Nessuna persona aggiunta.</div></div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn-danger-sm" onclick="clearAll()">Svuota tutto</button>
     </div>
-    <div id="parserResult"></div>
   </div>
 </div>
 </div>
@@ -977,59 +963,6 @@ function copyCode(){
 function clearAll(){
   if(!confirm('Svuotare tutto l\'albero genealogico?')) return;
   persone=[]; resetForm(); renderPersone(); updateOutput();
-}
-
-function tokenize(s){
-  const tokens=[]; let depth=0,cur='',i=0;
-  while(i<s.length){
-    const c=s[i];
-    if((c==='{'&&s[i+1]==='{')||(c==='['&&s[i+1]==='[')){ depth++; cur+=c+s[i+1]; i+=2; continue; }
-    if((c==='}'&&s[i+1]==='}')||(c===']'&&s[i+1]===']')){ depth=Math.max(0,depth-1); cur+=c+s[i+1]; i+=2; continue; }
-    if(c==='|'&&depth===0){ tokens.push(cur.trim()); cur=''; i++; continue; }
-    cur+=c; i++;
-  }
-  if(cur.trim()) tokens.push(cur.trim());
-  return tokens;
-}
-
-function parseInput(){
-  const raw=document.getElementById('parserInput').value.trim();
-  const result=document.getElementById('parserResult');
-  if(!raw){ result.innerHTML=''; return; }
-  let testo=raw.replace(/\{\{#invoke:[^|]+\|[^|]+/gi,'{{Discendenza');
-  const start=testo.indexOf('{{'),end=testo.lastIndexOf('}}');
-  if(start===-1||end===-1||end<=start){ result.innerHTML='<div class="pr error">Nessun template trovato.</div>'; return; }
-  const inner=testo.slice(start+2,end);
-  const tokens=tokenize(inner);
-  let v2=false,tipo='o',allinea='',larghezza='',didascalia='',align='';
-  tokens.forEach(t=>{ const m=t.match(/^([a-z][a-z0-9]*)\s*=\s*(.*)$/i); if(!m) return; const k=m[1].toLowerCase(),v=m[2].trim(); if(k==='v2'&&v==='y') v2=true; if(k==='tipo') tipo=v; if(k==='allinea') allinea=v; if(k==='larghezza') larghezza=v; if(k==='didascalia') didascalia=v; if(k==='align') align=v; });
-  const pos=tokens.filter(t=>{ if(!t) return false; if(t.toLowerCase()==='discendenza') return false; if(t.match(/^[a-z][a-z0-9]*\s*=/i)) return false; return true; });
-  const parsed=[]; let i=0;
-  while(i<pos.length){
-    const t0=pos[i],t1=pos[i+1];
-    if(!t0||isNaN(parseInt(t0))){ i++; continue; }
-    if(!t1||isNaN(parseInt(t1))){ i++; continue; }
-    const id=parseInt(t0),padre=parseInt(t1);
-    let simbolo='',soggetto='',titolo='',dateRaw=''; let offset;
-    if(v2){ simbolo=pos[i+2]||''; soggetto=pos[i+3]||''; titolo=pos[i+4]||''; dateRaw=pos[i+5]||''; offset=i+6; }
-    else{ soggetto=pos[i+2]||''; dateRaw=pos[i+3]||''; offset=i+4; }
-    const relazioni=[];
-    while(offset+4<pos.length){ const nx0=pos[offset],nx1=pos[offset+1]; if(!isNaN(parseInt(nx0))&&parseInt(nx0)>0&&!isNaN(parseInt(nx1))) break; relazioni.push({tipo:pos[offset]||'',ord:pos[offset+1]||'',dataRel:pos[offset+2]||'',correlato:pos[offset+3]||'',dateCorrelato:pos[offset+4]||'',_tipo:pos[offset]||'',_ord:pos[offset+1]||'',_dataRel:pos[offset+2]||'',_refDataRel:'',_correlato:pos[offset+3]||'',_refCorrelato:'',_dateCorrelato:pos[offset+4]||'',_refDateCorrelato:'',_dbCorr:[]}); offset+=5; }
-    parsed.push({id,padre,v2,soggetto,_soggetto:soggetto,_refSoggetto:'',simbolo,titolo,_titolo:titolo,_refTitolo:'',date:dateRaw,_date:dateRaw,_refDate:'',_dbSogg:[],_filiazione:'',_relGenitore:'',relazioni});
-    i=offset;
-  }
-  if(!parsed.length){ result.innerHTML='<div class="pr error">Nessuna persona riconosciuta.</div>'; return; }
-  persone=parsed;
-  document.getElementById('v2Toggle').checked=v2;
-  document.getElementById('v2Fields').style.display=v2?'block':'none';
-  document.getElementById('paramTipo').value=tipo||'o';
-  document.getElementById('paramAllinea').value=allinea||'';
-  document.getElementById('dxParams').style.display=allinea==='destra'?'grid':'none';
-  document.getElementById('paramLarghezza').value=larghezza;
-  document.getElementById('paramDidascalia').value=didascalia;
-  document.getElementById('paramAlign').value=align||'';
-  resetForm(); renderPersone(); updateOutput();
-  result.innerHTML='<div class="pr ok">✓ Importate '+parsed.length+' persone.</div>';
 }
 
 document.getElementById('v2Toggle').addEventListener('change',function(){ document.getElementById('v2Fields').style.display=this.checked?'block':'none'; updateOutput(); });
