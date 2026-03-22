@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor — Template Discendenza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Linux+Biolinum+O:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --wp-bg: #f8f9fa;
+  --wp-bg2: #eaecf0;
+  --wp-bg3: #ffffff;
+  --wp-border: #a2a9b1;
+  --wp-border2: #c8ccd1;
+  --wp-ink: #202122;
+  --wp-ink2: #54595d;
+  --wp-ink3: #72777d;
+  --wp-link: #3366cc;
+  --wp-red: #dd3333;
+  --wp-green: #14866d;
+  --wp-blue-light: #eaf3fb;
+  --wp-blue-mid: #a7d7f9;
+  --wp-success-bg: #d5fdf4;
+  --wp-success-border: #14866d;
+  --wp-error-bg: #fee7e6;
+  --wp-error-border: #dd3333;
+  --wp-warn-bg: #fef6e7;
+  --wp-warn-border: #fc3;
+  --r: 2px;
+  --shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Linux Biolinum O', 'Liberation Sans', Arial, sans-serif;
+  background: var(--wp-bg);
+  color: var(--wp-ink);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--wp-bg3);
+  border-bottom: 1px solid var(--wp-border);
+  padding: 10px 20px;
+}
+.topbar-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.topbar h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--wp-ink);
+}
+.topbar h1 span { color: var(--wp-ink3); font-size: .85rem; font-weight: 400; }
+.topbar-sep { color: var(--wp-border); font-size: .9rem; }
+
+/* LAYOUT */
+.layout {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 18px;
+  align-items: start;
+}
+@media(max-width:960px) { .layout { grid-template-columns: 1fr; } }
+
+/* CARD */
+.card {
+  background: var(--wp-bg3);
+  border: 1px solid var(--wp-border2);
+  border-radius: var(--r);
+  margin-bottom: 14px;
+}
+.card-header {
+  background: var(--wp-bg2);
+  border-bottom: 1px solid var(--wp-border2);
+  padding: 7px 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-header h2 {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--wp-ink);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  flex: 1;
+}
+.card-body { padding: 13px; }
+
+/* BADGE */
+.badge {
+  font-family: monospace;
+  font-size: .66rem;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-weight: 700;
+}
+.badge-blue { background: var(--wp-blue-light); color: var(--wp-link); border: 1px solid var(--wp-blue-mid); }
+.badge-yellow { background: var(--wp-warn-bg); color: #603000; border: 1px solid var(--wp-warn-border); }
+.badge-gray { background: var(--wp-bg2); color: var(--wp-ink2); border: 1px solid var(--wp-border2); }
+.badge-green { background: var(--wp-success-bg); color: var(--wp-green); border: 1px solid var(--wp-success-border); }
+
+/* TOGGLE */
+.toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.toggle { position: relative; width: 34px; height: 19px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--wp-border); cursor: pointer; transition: .18s; border-radius: 19px; }
+.toggle-slider::before { content: ''; position: absolute; width: 13px; height: 13px; left: 3px; bottom: 3px; background: #fff; transition: .18s; border-radius: 50%; }
+.toggle input:checked + .toggle-slider { background: var(--wp-link); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(15px); }
+.toggle-label { font-size: .88rem; color: var(--wp-ink); }
+
+/* FORM */
+.frow { display: grid; gap: 9px; margin-bottom: 9px; }
+.frow.c2 { grid-template-columns: 1fr 1fr; }
+.frow.c3 { grid-template-columns: 1fr 1fr 1fr; }
+.fg { margin-bottom: 9px; }
+
+.flabel {
+  display: flex; align-items: center; gap: 5px;
+  font-size: .78rem; font-weight: 700;
+  color: var(--wp-ink); margin-bottom: 3px;
+}
+.flabel .req { color: var(--wp-red); }
+
+input[type=text], select, textarea {
+  width: 100%; padding: 5px 8px;
+  border: 1px solid var(--wp-border);
+  border-radius: var(--r);
+  background: var(--wp-bg3);
+  color: var(--wp-ink);
+  font-family: 'Linux Biolinum O', sans-serif;
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+input[type=text]:focus, select:focus, textarea:focus {
+  border-color: var(--wp-link);
+  box-shadow: 0 0 0 2px rgba(51,102,204,.14);
+}
+input[type=text][readonly] {
+  background: var(--wp-bg2);
+  color: var(--wp-ink3);
+  cursor: default;
+}
+textarea { resize: vertical; min-height: 48px; line-height: 1.4; }
+select option { font-family: sans-serif; }
+
+.field-note {
+  font-size: .72rem; color: var(--wp-ink3);
+  margin-top: 2px; font-style: italic; line-height: 1.4;
+}
+
+/* PREVIEW INLINE */
+.inline-preview {
+  margin-top: 4px; font-size: .76rem;
+  font-family: monospace; color: var(--wp-ink2);
+  background: var(--wp-bg);
+  border: 1px solid var(--wp-border2);
+  border-radius: var(--r); padding: 2px 7px;
+  min-height: 20px;
+}
+.inline-preview .pv-label { color: var(--wp-ink3); }
+.inline-preview .pv-val { color: #603000; font-weight: 700; }
+
+/* TOOLTIP */
+.tip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--wp-bg2); border: 1px solid var(--wp-border);
+  color: var(--wp-ink3); font-size: .62rem; font-weight: 700;
+  cursor: help; position: relative; flex-shrink: 0;
+  font-family: monospace; transition: all .11s; user-select: none;
+}
+.tip:hover { background: var(--wp-link); color: #fff; border-color: var(--wp-link); }
+.tip .tb {
+  display: none; position: absolute; left: 19px; top: 50%; transform: translateY(-50%);
+  background: #fff; color: var(--wp-ink);
+  border: 1px solid var(--wp-border);
+  padding: 8px 11px; border-radius: var(--r); width: 255px;
+  font-family: 'Linux Biolinum O', sans-serif;
+  font-size: .78rem; font-weight: 400; line-height: 1.5;
+  z-index: 9999; box-shadow: var(--shadow); pointer-events: none;
+  text-transform: none; letter-spacing: 0;
+}
+.tip .tb::before { content: ''; position: absolute; right: 100%; top: 50%; transform: translateY(-50%); border: 5px solid transparent; border-right-color: var(--wp-border); }
+.tip .tb::after { content: ''; position: absolute; right: calc(100% - 1px); top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-right-color: #fff; }
+.tip:hover .tb { display: block; }
+.tb code { font-family: monospace; font-size: .8em; background: var(--wp-bg2); padding: 0 3px; border-radius: 2px; }
+.tb .tex { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--wp-border2); }
+.tb .ex { font-family: monospace; font-size: .72rem; color: var(--wp-green); display: block; margin-top: 2px; }
+
+/* REF */
+.ref-toggle {
+  font-size: .72rem; color: var(--wp-link); cursor: pointer;
+  border: none; background: none; padding: 0; margin-top: 3px;
+  display: inline-flex; align-items: center; gap: 3px; font-family: 'Linux Biolinum O', sans-serif;
+}
+.ref-toggle:hover { text-decoration: underline; }
+.ref-field { display: none; margin-top: 4px; }
+.ref-field.open { display: block; }
+.ref-label { font-size: .68rem; font-family: monospace; color: var(--wp-ink3); margin-bottom: 2px; }
+
+/* DATE BUILDER */
+.db { border: 1px solid var(--wp-border2); border-radius: var(--r); background: var(--wp-bg3); overflow: hidden; }
+.db-toolbar { background: var(--wp-bg2); border-bottom: 1px solid var(--wp-border2); padding: 4px 8px; display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.db-toolbar span { font-size: .7rem; color: var(--wp-ink3); margin-right: 2px; }
+.adb {
+  font-size: .7rem; padding: 1px 7px;
+  border: 1px solid var(--wp-border); border-radius: var(--r);
+  background: var(--wp-bg3); color: var(--wp-link); cursor: pointer;
+  transition: all .1s; white-space: nowrap;
+  font-family: 'Linux Biolinum O', sans-serif;
+}
+.adb:hover { background: var(--wp-blue-light); border-color: var(--wp-link); }
+.db-blocks { padding: 5px; min-height: 26px; }
+.db-block {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--wp-bg3); border: 1px solid var(--wp-border2);
+  border-radius: var(--r); padding: 3px 6px; margin-bottom: 3px;
+  cursor: grab; user-select: none;
+}
+.db-block:active { cursor: grabbing; }
+.db-block.dragging { opacity: .35; }
+.db-block.drag-over { border-color: var(--wp-link); background: var(--wp-blue-light); }
+.db-block .dh { color: var(--wp-border2); font-size: .8rem; cursor: grab; flex-shrink: 0; line-height: 1; }
+.db-block .bt { font-family: monospace; font-size: .63rem; color: var(--wp-ink3); background: var(--wp-bg2); padding: 1px 5px; border-radius: 2px; flex-shrink: 0; min-width: 38px; text-align: center; }
+.db-block input[type=text] { flex: 1; padding: 2px 5px; font-size: .85rem; border-width: 1px; }
+.db-block .rb { background: none; border: none; color: var(--wp-border); cursor: pointer; font-size: .9rem; padding: 0 2px; line-height: 1; transition: color .1s; flex-shrink: 0; }
+.db-block .rb:hover { color: var(--wp-red); }
+.db-preview {
+  padding: 3px 8px 5px; font-family: monospace; font-size: .7rem;
+  color: var(--wp-ink3); border-top: 1px solid var(--wp-border2);
+  min-height: 20px; background: var(--wp-bg2);
+}
+.db-preview span { color: #603000; font-weight: 700; }
+
+/* RELAZIONI */
+.rel-sec { margin-top: 11px; border-top: 1px solid var(--wp-border2); padding-top: 10px; }
+.rel-sec-hdr { display: flex; align-items: center; margin-bottom: 8px; gap: 6px; }
+.rel-sec-title { font-size: .78rem; font-weight: 700; color: var(--wp-ink); text-transform: uppercase; }
+.rel-block { background: var(--wp-bg); border: 1px solid var(--wp-border2); border-radius: var(--r); padding: 10px; margin-bottom: 6px; }
+.rel-block-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.rel-num { font-size: .72rem; font-weight: 700; color: var(--wp-ink3); text-transform: uppercase; letter-spacing: .02em; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 13px; border: 1px solid transparent;
+  border-radius: var(--r); cursor: pointer;
+  font-family: 'Linux Biolinum O', sans-serif;
+  font-size: .84rem; font-weight: 700;
+  transition: all .11s; white-space: nowrap;
+}
+.btn-primary { background: var(--wp-link); color: #fff; border-color: #2a4b8d; }
+.btn-primary:hover { background: #447ff5; }
+.btn-secondary { background: var(--wp-bg2); color: var(--wp-ink); border-color: var(--wp-border); }
+.btn-secondary:hover { background: var(--wp-bg3); border-color: var(--wp-ink3); }
+.btn-ghost { background: none; color: var(--wp-link); padding: 2px 6px; font-size: .76rem; border: none; }
+.btn-ghost:hover { text-decoration: underline; }
+.btn-danger-sm { background: none; color: var(--wp-red); border: 1px solid var(--wp-red); padding: 2px 7px; font-size: .7rem; font-family: 'Linux Biolinum O', sans-serif; cursor: pointer; border-radius: var(--r); transition: all .11s; }
+.btn-danger-sm:hover { background: var(--wp-red); color: #fff; }
+.btn-add-rel {
+  background: none; color: var(--wp-link);
+  border: 1px dashed var(--wp-border); width: 100%;
+  padding: 4px; font-size: .76rem;
+  font-family: 'Linux Biolinum O', sans-serif;
+  margin-top: 3px; cursor: pointer; border-radius: var(--r); transition: all .11s;
+}
+.btn-add-rel:hover { background: var(--wp-blue-light); border-color: var(--wp-link); }
+.btn-row { display: flex; gap: 6px; margin-top: 11px; flex-wrap: wrap; }
+
+/* LISTA */
+.pi {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px; border: 1px solid var(--wp-border2);
+  border-radius: var(--r); margin-bottom: 3px;
+  background: var(--wp-bg3); transition: background .1s;
+}
+.pi:hover { background: var(--wp-blue-light); }
+.pi.capo { border-left: 3px solid var(--wp-link); }
+.pid { font-family: monospace; font-size: .67rem; color: #fff; background: var(--wp-ink3); padding: 1px 5px; border-radius: 2px; min-width: 22px; text-align: center; flex-shrink: 0; }
+.capo .pid { background: var(--wp-link); }
+.pname { flex: 1; font-size: .88rem; color: var(--wp-ink); font-weight: 700; }
+.pinfo { font-family: monospace; font-size: .64rem; color: var(--wp-ink3); white-space: nowrap; }
+.pactions { display: flex; gap: 2px; flex-shrink: 0; }
+
+/* OUTPUT */
+.ow { position: relative; }
+.oc {
+  background: var(--wp-bg); color: var(--wp-ink);
+  font-family: monospace; font-size: .8rem;
+  line-height: 1.65; padding: 11px;
+  border: 1px solid var(--wp-border2); border-radius: var(--r);
+  min-height: 150px; max-height: 400px; overflow-y: auto;
+  white-space: pre-wrap; word-break: break-word;
+}
+.copy-btn {
+  position: absolute; top: 5px; right: 5px;
+  background: var(--wp-bg2); color: var(--wp-link);
+  border: 1px solid var(--wp-border); padding: 2px 9px;
+  font-family: 'Linux Biolinum O', sans-serif; font-size: .72rem;
+  cursor: pointer; border-radius: var(--r); transition: all .11s;
+}
+.copy-btn:hover { background: var(--wp-blue-light); }
+.copy-btn.copied { color: var(--wp-green); border-color: var(--wp-green); background: var(--wp-success-bg); }
+
+.vp { margin-top: 9px; border: 1px solid var(--wp-border2); border-radius: var(--r); overflow: hidden; }
+.vh { padding: 5px 10px; font-size: .76rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+.vh.ok { background: var(--wp-success-bg); color: var(--wp-green); }
+.vh.err { background: var(--wp-error-bg); color: var(--wp-red); }
+.vh.empty { background: var(--wp-bg2); color: var(--wp-ink3); font-weight: 400; }
+.vi { padding: 5px 10px; }
+.vitem { font-size: .79rem; padding: 3px 0; border-bottom: 1px solid var(--wp-border2); color: var(--wp-red); display: flex; gap: 5px; align-items: flex-start; }
+.vitem:last-child { border-bottom: none; }
+.vitem::before { content: '⚠'; font-size: .7rem; margin-top: 2px; flex-shrink: 0; }
+
+.gp-box { background: var(--wp-bg); border: 1px solid var(--wp-border2); border-radius: var(--r); padding: 10px; margin-bottom: 11px; }
+.gp-title { font-size: .72rem; font-weight: 700; color: var(--wp-ink3); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 8px; }
+
+.empty-state { text-align: center; padding: 14px; color: var(--wp-ink3); font-style: italic; font-size: .84rem; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--wp-bg2); }
+::-webkit-scrollbar-thumb { background: var(--wp-border); border-radius: 3px; }
+
+.parser-hint { font-size: .79rem; color: var(--wp-ink3); margin-bottom: 8px; font-style: italic; line-height: 1.5; }
+.pr { margin-top: 8px; padding: 6px 10px; border-radius: var(--r); font-size: .8rem; }
+.pr.ok { background: var(--wp-success-bg); border: 1px solid var(--wp-success-border); color: var(--wp-green); }
+.pr.error { background: var(--wp-error-bg); border: 1px solid var(--wp-error-border); color: var(--wp-red); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <h1>Template:Discendenza <span>— Editor assistito</span></h1>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- ===== SINISTRA ===== -->
+<div>
+
+<div class="card">
+  <div class="card-header"><h2>Parametri globali</h2></div>
+  <div class="card-body">
+    <div class="gp-box">
+      <div class="gp-title">Formato</div>
+      <div class="toggle-row">
+        <label class="toggle"><input type="checkbox" id="v2Toggle"><span class="toggle-slider"></span></label>
+        <span class="toggle-label">Formato v2</span>
+        <span class="tip">?<span class="tb">Attiva il formato v2 (<code>v2=y</code>). Introduce i campi <code>simbolo</code> e <code>titolo</code> per ogni persona e le relazioni strutturate con simboli automatici.</span></span>
+      </div>
+    </div>
+    <div class="frow c2">
+      <div class="fg">
+        <div class="flabel">Disposizione <span class="tip">?<span class="tb"><b>Orizzontale</b> (predefinito) — consigliato per alberi complessi.<br><br><b>Verticale</b> — solo per alberi semplici con poche generazioni.</span></span></div>
+        <select id="paramTipo"><option value="o">Orizzontale (predefinito)</option><option value="v">Verticale</option></select>
+      </div>
+      <div class="fg">
+        <div class="flabel">Allineamento riquadro <span class="tip">?<span class="tb"><code>Destra</code> allinea il riquadro a destra della pagina, permettendo al testo di scorrere a fianco.</span></span></div>
+        <select id="paramAllinea"><option value="">Centro (predefinito)</option><option value="destra">Destra</option></select>
+      </div>
+    </div>
+    <div class="frow c2" id="dxParams" style="display:none">
+      <div class="fg"><div class="flabel">Larghezza (px)</div><input type="text" id="paramLarghezza"></div>
+      <div class="fg"><div class="flabel">Didascalia</div><input type="text" id="paramDidascalia"></div>
+    </div>
+    <div class="fg">
+      <div class="flabel">Allineamento testo celle <span class="tip">?<span class="tb"><b>Centro</b> (predefinito) · <b>Sinistra</b> · <b>Destra</b></span></span></div>
+      <select id="paramAlign"><option value="">Centro (predefinito)</option><option value="s">Sinistra</option><option value="d">Destra</option></select>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Persona</h2>
+    <span class="badge badge-blue" id="formModeBadge">NUOVO</span>
+  </div>
+  <div class="card-body">
+
+    <div class="frow c2">
+      <div class="fg">
+        <div class="flabel">ID <span class="tip">?<span class="tb">Identificativo numerico univoco, assegnato automaticamente in sequenza. Non è modificabile per evitare errori di struttura.</span></span></div>
+        <input type="text" id="fId" readonly>
+      </div>
+      <div class="fg">
+        <div class="flabel">Genitore <span class="req">*</span> <span class="tip">?<span class="tb">Seleziona il genitore dall'elenco. Scegli <b>Capostipite (−1)</b> per la radice dell'albero. Ogni albero deve avere esattamente un capostipite.</span></span></div>
+        <select id="fPadre"><option value="-1">— Capostipite (−1)</option></select>
+      </div>
+    </div>
+
+    <div class="frow c2">
+      <div class="fg">
+        <div class="flabel">Tipo di filiazione <span class="tip">?<span class="tb">Indica se il soggetto è figlio naturale, adottivo o legittimato. Il wikilink viene inserito automaticamente prima del nome.<br><br>Lascia su <b>Legittimo</b> in tutti gli altri casi.</span></span></div>
+        <select id="fFiliazione" onchange="updateFiliazPreview()">
+          <option value="">Legittimo (nessuna indicazione)</option>
+          <option value="nat">Figlio naturale</option>
+          <option value="adott">Adottivo</option>
+          <option value="legitt">Legittimato</option>
+        </select>
+        <div class="inline-preview"><span class="pv-label">anteprima: </span><span class="pv-val" id="pvFilText">—</span></div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Figlio della relazione n° <span class="tip">?<span class="tb">Se il genitore ha più relazioni, indica di quale è figlio questo soggetto inserendo il numero della relazione (es. <code>2</code>). Genera automaticamente <code>(II)</code> prima del nome.<br><br><b>Non compilare per il capostipite.</b> Lascia vuoto se il genitore ha una sola relazione.</span></span></div>
+        <input type="text" id="fRelazioneGenitore" onblur="updateRelGenitorePreview()">
+        <div class="field-note">numero intero · 1 2 3 → (I) (II) (III)</div>
+        <div class="inline-preview"><span class="pv-label">anteprima: </span><span class="pv-val" id="pvRelGText">—</span></div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <div class="flabel">Nome del soggetto <span class="req">*</span> <span class="tip">?<span class="tb">Nome della persona. Può essere testo semplice o wikilink — i doppi parentesi quadre non sono obbligatori.<div class="tex"><span class="ex">Giovanni Rossi</span><span class="ex">[[Giovanni Rossi]]</span><span class="ex">[[Giovanni Rossi|Giovanni]]</span></div>I prefissi di filiazione vengono aggiunti automaticamente.</span></span></div>
+      <input type="text" id="fSoggetto">
+      <button class="ref-toggle" onclick="toggleRef('refSoggetto')">+ aggiungi nota a piè di pagina</button>
+      <div class="ref-field" id="refSoggetto">
+        <div class="ref-label">&lt;ref&gt; testo della nota</div>
+        <textarea id="fRefSoggetto" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div id="v2Fields" style="display:none">
+      <div class="fg">
+        <div class="flabel">Simbolo <span class="tip">?<span class="tb">Simbolo, stemma o cappello prelatizio visualizzato sopra il nome.<div class="tex"><span class="ex">{{Simbolo|Priest-hat.svg|25}}</span><span class="ex">{{Simbolo|Bishop-hat.svg|25}}</span></div>Lascia vuoto se non necessario.</span></span></div>
+        <input type="text" id="fSimbolo">
+      </div>
+      <div class="fg">
+        <div class="flabel">Titolo <span class="tip">?<span class="tb">Titolo nobiliare, carica o qualifica. Per più titoli usare <code>&lt;br&gt;</code> come separatore.<div class="tex"><span class="ex">Imperatore dei Francesi</span><span class="ex">Re di Francia&lt;br&gt;Duca di Borgogna</span></div>Lascia vuoto se non necessario.</span></span></div>
+        <input type="text" id="fTitolo">
+        <button class="ref-toggle" onclick="toggleRef('refTitolo')">+ aggiungi nota a piè di pagina</button>
+        <div class="ref-field" id="refTitolo">
+          <div class="ref-label">&lt;ref&gt; testo della nota</div>
+          <textarea id="fRefTitolo" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <div class="flabel">Date di vita <span class="tip">?<span class="tb">Costruisci le date aggiungendo blocchi. Trascina per riordinarli. L'anteprima si aggiorna quando esci dal campo.</span></span></div>
+      <div class="db">
+        <div class="db-toolbar">
+          <span>+ aggiungi:</span>
+          <button class="adb" onclick="addDB('sogg','nascita')">* nascita</button>
+          <button class="adb" onclick="addDB('sogg','morte')">† morte</button>
+          <button class="adb" onclick="addDB('sogg','fl')">fl.</button>
+          <button class="adb" onclick="addDB('sogg','viv')">viv.</button>
+          <button class="adb" onclick="addDB('sogg','test')">test.</button>
+          <button class="adb" onclick="addDB('sogg','batt')">batt.</button>
+          <button class="adb" onclick="addDB('sogg','sep')">sep.</button>
+          <button class="adb" onclick="addDB('sogg','disp')">disp.</button>
+          <button class="adb" onclick="addDB('sogg','comb')">comb.</button>
+          <button class="adb" onclick="addDB('sogg','testo')">testo libero</button>
+        </div>
+        <div class="db-blocks" id="dbBlocks_sogg"></div>
+        <div class="db-preview" id="dbPreview_sogg">anteprima: <span>—</span></div>
+      </div>
+      <button class="ref-toggle" onclick="toggleRef('refDate')">+ aggiungi nota a piè di pagina alle date</button>
+      <div class="ref-field" id="refDate">
+        <div class="ref-label">&lt;ref&gt; testo della nota</div>
+        <textarea id="fRefDate" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="rel-sec">
+      <div class="rel-sec-hdr">
+        <span class="rel-sec-title">Relazioni</span>
+        <span class="tip">?<span class="tb">Aggiungi una relazione per ogni coniuge o partner. Il numero d'ordine viene usato dal campo "Figlio della relazione n°" dei figli.</span></span>
+      </div>
+      <div id="relazioniContainer"></div>
+      <button class="btn-add-rel" onclick="addRelazione()">+ aggiungi relazione</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="salvaPersona()">✓ Salva persona</button>
+      <button class="btn btn-secondary" onclick="resetForm()">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><h2>Albero genealogico</h2><span class="badge badge-gray" id="personeCnt">0 persone</span></div>
+  <div class="card-body">
+    <div id="personeList"><div class="empty-state">Nessuna persona aggiunta.</div></div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn-danger-sm" onclick="clearAll()">Svuota tutto</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- fine sinistra -->
+
+<!-- ===== DESTRA ===== -->
+<div>
+<div class="card">
+  <div class="card-header"><h2>Codice generato</h2></div>
+  <div class="card-body">
+    <div class="ow">
+      <pre class="oc" id="outputCode">// Aggiungi persone per generare il codice.</pre>
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copia</button>
+    </div>
+    <div class="vp" id="valPanel"><div class="vh empty">In attesa di dati</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><h2>Importa da testo</h2><span class="badge badge-yellow">PARSER</span></div>
+  <div class="card-body">
+    <p class="parser-hint">Incolla un template <code>{{Discendenza}}</code> esistente per importarne la struttura.</p>
+    <div class="fg"><textarea id="parserInput" rows="7"></textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="parseInput()">Importa</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('parserInput').value=''">Svuota</button>
+    </div>
+    <div id="parserResult"></div>
+  </div>
+</div>
+</div>
+
+</div><!-- fine layout -->
+
+<script>
+let persone = [];
+let editingId = null;
+let relazioniTemp = [];
+let dbData = { sogg: [] };
+let dragSrc = { ctx: null, idx: null };
+
+const DBC = {
+  nascita:{ label:'* nascita', wiki:'' },
+  morte:  { label:'† morte',   wiki:'' },
+  fl:     { label:'fl.',  wiki:'[[Floruit|fl.]]' },
+  viv:    { label:'viv.', wiki:'[[Vivente|viv.]]' },
+  test:   { label:'test.',wiki:'[[Testamento|test.]]' },
+  batt:   { label:'batt.',wiki:'[[Battesimo|batt.]]' },
+  sep:    { label:'sep.', wiki:'[[Sepoltura|sep.]]' },
+  disp:   { label:'disp.',wiki:'[[Persona scomparsa|disp.]]' },
+  comb:   { label:'comb.',wiki:'[[Morto in combattimento|comb.]]' },
+  testo:  { label:'testo',wiki:'' },
+};
+
+const DB_TIPS = {
+  nascita:'Anno di nascita.<br>Es: <code>1769</code> · <code>~1450</code> · <code>?</code>',
+  morte:  'Anno di morte.<br>Es: <code>1821</code> · <code>~1503</code> · <code>ante 1347</code> · <code>post 1580</code> · <code>?</code>',
+  fl:     'Periodo di attività (floruit).<br>Es: <code>1456–1482</code>',
+  viv:    'Data di attestazione.<br>Es: <code>1683</code>',
+  test:   'Data del testamento.<br>Es: <code>24.III.1215</code> · <code>1560</code>',
+  batt:   'Data di battesimo.<br>Es: <code>12.III.1456</code>',
+  sep:    'Data di sepoltura.<br>Es: <code>15.V.1623</code>',
+  disp:   'Disperso/a.<br>Es: <code>1952</code> · <code>?</code>',
+  comb:   'Morto in combattimento.<br>Es: <code>1941</code> · <code>?</code>',
+  testo:  'Qualsiasi testo libero.',
+};
+
+const MESI_NOMI = {
+  'gennaio':1,'febbraio':2,'marzo':3,'aprile':4,'maggio':5,'giugno':6,
+  'luglio':7,'agosto':8,'settembre':9,'ottobre':10,'novembre':11,'dicembre':12,
+  'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,
+  'jul':7,'aug':8,'sep':9,'oct':10,'nov':11,'dec':12
+};
+const ROMANI = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX'];
+
+const TIPI_REL = { m:'Matrimonio', c:'Concubinato', u:'Unione civile', f:'Fidanzamento', r:'Relazione' };
+const TIPI_REL_PREVIEW = { '':'—', m:'⚭', c:'<i>con.</i>', u:'<i>civ.</i>', f:'<i>fid.</i>', r:'<i>rel.</i>' };
+
+const FILIAZIONE_MAP = {
+  '':      '',
+  'nat':   '([[Figlio naturale|nat.]])',
+  'adott': '([[Adozione|adott.]])',
+  'legitt':'([[Figlio_naturale#Riconoscimento_del_figlio_nato_fuori_del_matrimonio|legitt.]])'
+};
+const FILIAZIONE_PREVIEW = {
+  '':      '—',
+  'nat':   '(nat.)',
+  'adott': '(adott.)',
+  'legitt':'(legitt.)'
+};
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function stripWL(s){ return (s||'').replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi,'').replace(/\[\[([^\]|]+\|)?([^\]]+)\]\]/g,'$2').replace(/\{\{[^}]+\}\}/g,'').replace(/<[^>]+>/g,'').trim()||s; }
+function nextId(){ return persone.length ? Math.max(...persone.map(p=>p.id))+1 : 1; }
+function toRomano(n){ const i=parseInt(n); if(isNaN(i)||i<1||i>20) return String(n); return ROMANI[i-1]; }
+function meseToRomano(m){ const n=parseInt(m); if(!isNaN(n)&&n>=1&&n<=12) return ROMANI[n-1]; const low=m.toLowerCase().replace('.',''); if(MESI_NOMI[low]) return ROMANI[MESI_NOMI[low]-1]; return m; }
+function normalizzaData(s){ if(!s) return s; s=s.trim(); s=s.replace(/(\d{1,2})\s+([a-zA-Zàèùì]+)\s+(\d{3,4})/g,(m,g,mo,a)=>g+'.'+meseToRomano(mo)+'.'+a); s=s.replace(/(\d{1,2})[./](\d{1,2})[./](\d{3,4})/g,(m,g,mo,a)=>g+'.'+meseToRomano(mo)+'.'+a); return s; }
+function toggleRef(id){ document.getElementById(id).classList.toggle('open'); }
+
+function updateFiliazPreview(){
+  const v=document.getElementById('fFiliazione').value;
+  document.getElementById('pvFilText').textContent=FILIAZIONE_PREVIEW[v]||'—';
+}
+function updateRelGenitorePreview(){
+  const v=document.getElementById('fRelazioneGenitore').value.trim();
+  document.getElementById('pvRelGText').textContent=v?'('+toRomano(v)+')':'—';
+  updateOutput();
+}
+
+function addDB(ctx,type,value){
+  if(!dbData[ctx]) dbData[ctx]=[];
+  dbData[ctx].push({type,value:value||''});
+  renderDB(ctx);
+}
+
+function renderDB(ctx){
+  const c=document.getElementById('dbBlocks_'+ctx);
+  const p=document.getElementById('dbPreview_'+ctx);
+  if(!c||!p) return;
+  c.innerHTML='';
+  (dbData[ctx]||[]).forEach((b,i)=>{
+    const cfg=DBC[b.type];
+    const div=document.createElement('div');
+    div.className='db-block'; div.draggable=true;
+    const input=document.createElement('input');
+    input.type='text'; input.value=b.value; input.title=DB_TIPS[b.type]||'';
+    input.addEventListener('blur',()=>{ dbData[ctx][i].value=input.value; renderDB(ctx); updateOutput(); });
+    input.addEventListener('input',()=>{ dbData[ctx][i].value=input.value; });
+    div.innerHTML=`<span class="dh">⠿</span><span class="bt">${esc(cfg.label)}</span>`;
+    div.appendChild(input);
+    const rb=document.createElement('button'); rb.className='rb'; rb.textContent='×';
+    rb.addEventListener('click',()=>removeDB(ctx,i));
+    div.appendChild(rb);
+    div.addEventListener('dragstart',e=>{ dragSrc={ctx,idx:i}; div.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    div.addEventListener('dragend',()=>{ div.classList.remove('dragging'); document.querySelectorAll('.db-block').forEach(d=>d.classList.remove('drag-over')); });
+    div.addEventListener('dragover',e=>{ e.preventDefault(); div.classList.add('drag-over'); });
+    div.addEventListener('dragleave',()=>div.classList.remove('drag-over'));
+    div.addEventListener('drop',e=>{ e.preventDefault(); if(dragSrc.ctx===ctx&&dragSrc.idx!==null&&dragSrc.idx!==i){ const a=dbData[ctx],tmp=a[dragSrc.idx]; a.splice(dragSrc.idx,1); a.splice(i,0,tmp); renderDB(ctx); } });
+    c.appendChild(div);
+  });
+  const str=buildDateStr(ctx);
+  p.innerHTML='anteprima: <span>'+(str?esc(str):'—')+'</span>';
+}
+
+function removeDB(ctx,i){ if(dbData[ctx]) dbData[ctx].splice(i,1); renderDB(ctx); updateOutput(); }
+
+function buildDateStr(ctx){
+  return (dbData[ctx]||[]).map(b=>{
+    const cfg=DBC[b.type]; const v=normalizzaData(b.value);
+    if(b.type==='nascita') return v?'*'+v:'';
+    if(b.type==='morte')   return v?'†'+v:'';
+    if(b.type==='testo')   return v||'';
+    return v?(cfg.wiki?cfg.wiki+' '+v:v):(cfg.wiki||'');
+  }).filter(Boolean).join(' ');
+}
+
+function buildDBElement(ctx){
+  const wrap=document.createElement('div'); wrap.className='db';
+  wrap.innerHTML=`
+    <div class="db-toolbar">
+      <span>+ aggiungi:</span>
+      <button class="adb" onclick="addDB('${ctx}','nascita')">* nascita</button>
+      <button class="adb" onclick="addDB('${ctx}','morte')">† morte</button>
+      <button class="adb" onclick="addDB('${ctx}','fl')">fl.</button>
+      <button class="adb" onclick="addDB('${ctx}','viv')">viv.</button>
+      <button class="adb" onclick="addDB('${ctx}','test')">test.</button>
+      <button class="adb" onclick="addDB('${ctx}','batt')">batt.</button>
+      <button class="adb" onclick="addDB('${ctx}','sep')">sep.</button>
+      <button class="adb" onclick="addDB('${ctx}','disp')">disp.</button>
+      <button class="adb" onclick="addDB('${ctx}','comb')">comb.</button>
+      <button class="adb" onclick="addDB('${ctx}','testo')">testo libero</button>
+    </div>
+    <div class="db-blocks" id="dbBlocks_${ctx}"></div>
+    <div class="db-preview" id="dbPreview_${ctx}">anteprima: <span>—</span></div>
+  `;
+  return wrap;
+}
+
+function addRelazione(data){
+  const idx=relazioniTemp.length;
+  dbData['rel_'+idx]=(data&&data._dbCorr)||[];
+  relazioniTemp.push(data||{tipo:'',ord:'',dataRel:'',refDataRel:'',correlato:'',refCorrelato:'',dateCorrelato:'',refDateCorrelato:''});
+  renderRelazioni();
+}
+
+function renderRelazioni(){
+  const c=document.getElementById('relazioniContainer'); c.innerHTML='';
+  relazioniTemp.forEach((r,i)=>{
+    const ctx='rel_'+i;
+    if(!dbData[ctx]) dbData[ctx]=[];
+    const div=document.createElement('div'); div.className='rel-block';
+    div.innerHTML=`
+      <div class="rel-block-hdr">
+        <span class="rel-num">Relazione ${i+1}${r.ord?' — '+toRomano(r.ord):''}</span>
+        <button class="btn-danger-sm" onclick="removeRel(${i})">rimuovi</button>
+      </div>
+      <div class="frow c2">
+        <div class="fg">
+          <div class="flabel">Tipo di relazione <span class="tip">?<span class="tb">Genera automaticamente il simbolo o l'abbreviazione nel template.<br><br>Matrimonio → ⚭<br>Concubinato → con.<br>Unione civile → civ.<br>Fidanzamento → fid.<br>Relazione → rel.</span></span></div>
+          <select id="relTipo_${i}" onchange="updateRelTipo(${i},this.value)">
+            <option value="" ${!r.tipo?'selected':''}>— nessuno</option>
+            ${Object.entries(TIPI_REL).map(([k,v])=>`<option value="${k}" ${r.tipo===k?'selected':''}>${esc(v)}</option>`).join('')}
+          </select>
+          <div class="inline-preview"><span class="pv-label">anteprima: </span><span class="pv-val" id="pvTipoRel_${i}">${TIPI_REL_PREVIEW[r.tipo||'']||'—'}</span></div>
+        </div>
+        <div class="fg">
+          <div class="flabel">Numero d'ordine <span class="tip">?<span class="tb">Ordine della relazione quando ce ne sono più di una. Inserisci un numero intero, viene convertito in numero romano.<div class="tex"><span class="ex">1 → (I) · 2 → (II)</span></div>Lascia vuoto se c'è una sola relazione.</span></span></div>
+          <input type="text" id="relOrd_${i}" value="${esc(r.ord||'')}" onblur="updateRelOrd(${i},this.value)">
+        </div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Data della relazione <span class="tip">?<span class="tb"><b>Non appare nel testo</b> — è visibile solo come tooltip passando il mouse sul simbolo.<br><br>Puoi scrivere in qualsiasi formato.<div class="tex"><span class="ex">20 febbraio 1810 → 20.II.1810</span><span class="ex">20/2/1810 → 20.II.1810</span></div></span></span></div>
+        <input type="text" id="relDataRel_${i}" value="${esc(r.dataRel||'')}" onblur="updateRelData(${i},this.value)">
+        <button class="ref-toggle" onclick="toggleRef('refDR${i}')">+ aggiungi nota a piè di pagina</button>
+        <div class="ref-field" id="refDR${i}">
+          <div class="ref-label">&lt;ref&gt; testo della nota</div>
+          <textarea rows="2" onblur="updateRel(${i},'refDataRel',this.value)">${esc(r.refDataRel||'')}</textarea>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Nome del correlato <span class="tip">?<span class="tb">Nome del coniuge o partner. Testo semplice o wikilink.<div class="tex"><span class="ex">Maria Rossi</span><span class="ex">[[Maria Rossi]]</span></div></span></span></div>
+        <input type="text" id="relCorrelato_${i}" value="${esc(r.correlato||'')}" onblur="updateRel(${i},'correlato',this.value)">
+        <button class="ref-toggle" onclick="toggleRef('refCorr${i}')">+ aggiungi nota a piè di pagina</button>
+        <div class="ref-field" id="refCorr${i}">
+          <div class="ref-label">&lt;ref&gt; testo della nota</div>
+          <textarea rows="2" onblur="updateRel(${i},'refCorrelato',this.value)">${esc(r.refCorrelato||'')}</textarea>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Date del correlato <span class="tip">?<span class="tb">Date di vita del coniuge o partner. Stessa struttura delle date del soggetto.</span></span></div>
+        <div id="dbContainer_${ctx}"></div>
+        <button class="ref-toggle" onclick="toggleRef('refDC${i}')">+ aggiungi nota a piè di pagina alle date</button>
+        <div class="ref-field" id="refDC${i}">
+          <div class="ref-label">&lt;ref&gt; testo della nota</div>
+          <textarea rows="2" onblur="updateRel(${i},'refDateCorrelato',this.value)">${esc(r.refDateCorrelato||'')}</textarea>
+        </div>
+      </div>
+    `;
+    c.appendChild(div);
+    div.querySelector('#dbContainer_'+ctx).appendChild(buildDBElement(ctx));
+    renderDB(ctx);
+  });
+}
+
+function updateRel(i,f,v){ relazioniTemp[i][f]=v; updateOutput(); }
+function updateRelTipo(i,v){ relazioniTemp[i].tipo=v; const el=document.getElementById('pvTipoRel_'+i); if(el) el.innerHTML=TIPI_REL_PREVIEW[v]||'—'; updateOutput(); }
+function updateRelOrd(i,v){ relazioniTemp[i].ord=v; renderRelazioni(); }
+function updateRelData(i,v){ relazioniTemp[i].dataRel=normalizzaData(v); const el=document.getElementById('relDataRel_'+i); if(el) el.value=relazioniTemp[i].dataRel; updateOutput(); }
+
+function removeRel(i){
+  relazioniTemp.splice(i,1);
+  const newDB={};
+  Object.keys(dbData).forEach(k=>{ if(!k.startsWith('rel_')) newDB[k]=dbData[k]; });
+  relazioniTemp.forEach((_,j)=>{ newDB['rel_'+j]=dbData['rel_'+(j<i?j:j+1)]||[]; });
+  dbData=newDB; renderRelazioni(); updateOutput();
+}
+
+function updatePadreSelect(sel_val){
+  const sel=document.getElementById('fPadre');
+  const cur=sel_val!==undefined?String(sel_val):sel.value;
+  sel.innerHTML='<option value="-1">— Capostipite (−1)</option>';
+  persone.forEach(p=>{
+    if(p.id===editingId) return;
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    opt.textContent=p.id+' — '+stripWL(p._soggetto||p.soggetto).substring(0,40);
+    if(String(p.id)===cur) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  if(cur==='-1'||cur===undefined) sel.value='-1';
+}
+
+function buildPrefisso(){
+  const fil=document.getElementById('fFiliazione').value;
+  const relN=document.getElementById('fRelazioneGenitore').value.trim();
+  let pre='';
+  if(relN){ const r=parseInt(relN); if(!isNaN(r)&&r>=1) pre+='('+toRomano(r)+') '; }
+  const filCode=FILIAZIONE_MAP[fil]||'';
+  if(filCode) pre+=filCode+' ';
+  return pre.trimEnd();
+}
+
+function salvaPersona(){
+  const id=parseInt(document.getElementById('fId').value);
+  const padre=parseInt(document.getElementById('fPadre').value);
+  const soggRaw=document.getElementById('fSoggetto').value.trim();
+  const v2=document.getElementById('v2Toggle').checked;
+  if(isNaN(id)||id<1){ alert('ID non valido.'); return; }
+  if(isNaN(padre)){ alert('Genitore non valido.'); return; }
+  if(!soggRaw){ alert('Il nome del soggetto è obbligatorio.'); return; }
+  const dup=persone.find(p=>p.id===id&&p.id!==editingId);
+  if(dup){ alert('ID '+id+' già utilizzato.'); return; }
+
+  const prefisso=buildPrefisso();
+  const refSogg=document.getElementById('fRefSoggetto').value.trim();
+  const refDate=document.getElementById('fRefDate').value.trim();
+  const refTitolo=v2?(document.getElementById('fRefTitolo').value.trim()):'';
+  const titoloRaw=v2?(document.getElementById('fTitolo').value.trim()):'';
+  const simb=v2?(document.getElementById('fSimbolo').value.trim()):'';
+  const dateStr=buildDateStr('sogg')+(refDate?'<ref>'+refDate+'</ref>':'');
+  const soggetto=(prefisso?prefisso+' ':'')+soggRaw+(refSogg?'<ref>'+refSogg+'</ref>':'');
+  const titolo=titoloRaw+(refTitolo?'<ref>'+refTitolo+'</ref>':'');
+
+  const relazioni=relazioniTemp.map((r,i)=>{
+    const ctx='rel_'+i;
+    const dcStr=buildDateStr(ctx);
+    return {
+      tipo:r.tipo, ord:r.ord?toRomano(r.ord):'',
+      dataRel:normalizzaData(r.dataRel||'')+(r.refDataRel?'<ref>'+r.refDataRel+'</ref>':''),
+      correlato:(r.correlato||'')+(r.refCorrelato?'<ref>'+r.refCorrelato+'</ref>':''),
+      dateCorrelato:dcStr+(r.refDateCorrelato?'<ref>'+r.refDateCorrelato+'</ref>':''),
+      _dbCorr:[...(dbData[ctx]||[])],
+      _ord:r.ord,_tipo:r.tipo,_dataRel:r.dataRel||'',_refDataRel:r.refDataRel||'',
+      _correlato:r.correlato||'',_refCorrelato:r.refCorrelato||'',
+      _dateCorrelato:dcStr,_refDateCorrelato:r.refDateCorrelato||''
+    };
+  });
+
+  const persona={
+    id,padre,v2,soggetto,titolo,simbolo:simb,date:dateStr,relazioni,
+    _soggetto:soggRaw,_refSoggetto:refSogg,
+    _titolo:titoloRaw,_refTitolo:refTitolo,
+    _date:buildDateStr('sogg'),_refDate:refDate,
+    _dbSogg:[...dbData.sogg],
+    _filiazione:document.getElementById('fFiliazione').value,
+    _relGenitore:document.getElementById('fRelazioneGenitore').value.trim()
+  };
+
+  if(editingId!==null){ const idx=persone.findIndex(p=>p.id===editingId); if(idx!==-1) persone[idx]=persona; }
+  else persone.push(persona);
+  persone.sort((a,b)=>a.id-b.id);
+  resetForm(); renderPersone(); updateOutput();
+}
+
+function resetForm(){
+  editingId=null; relazioniTemp=[];
+  dbData.sogg=[];
+  Object.keys(dbData).forEach(k=>{ if(k.startsWith('rel_')) delete dbData[k]; });
+  document.getElementById('fId').value=nextId();
+  updatePadreSelect(-1);
+  ['fSoggetto','fRefSoggetto','fSimbolo','fTitolo','fRefTitolo','fRefDate'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('fFiliazione').value='';
+  document.getElementById('fRelazioneGenitore').value='';
+  document.getElementById('pvFilText').textContent='—';
+  document.getElementById('pvRelGText').textContent='—';
+  document.getElementById('relazioniContainer').innerHTML='';
+  renderDB('sogg');
+  document.querySelectorAll('.ref-field.open').forEach(el=>el.classList.remove('open'));
+  document.getElementById('formModeBadge').textContent='NUOVO';
+  document.getElementById('formModeBadge').className='badge badge-blue';
+}
+
+function editPersona(id){
+  const p=persone.find(x=>x.id===id); if(!p) return;
+  editingId=id;
+  dbData.sogg=(p._dbSogg||[]).map(b=>({...b}));
+  relazioniTemp=p.relazioni.map(r=>({
+    tipo:r._tipo||r.tipo,ord:r._ord||r.ord,
+    dataRel:r._dataRel||r.dataRel||'',refDataRel:r._refDataRel||'',
+    correlato:r._correlato||r.correlato||'',refCorrelato:r._refCorrelato||'',
+    dateCorrelato:r._dateCorrelato||r.dateCorrelato||'',refDateCorrelato:r._refDateCorrelato||''
+  }));
+  p.relazioni.forEach((r,i)=>{ dbData['rel_'+i]=(r._dbCorr||[]).map(b=>({...b})); });
+  document.getElementById('fId').value=p.id;
+  updatePadreSelect(p.padre);
+  document.getElementById('fSoggetto').value=p._soggetto||p.soggetto;
+  document.getElementById('fRefSoggetto').value=p._refSoggetto||'';
+  document.getElementById('fFiliazione').value=p._filiazione||'';
+  document.getElementById('fRelazioneGenitore').value=p._relGenitore||'';
+  if(document.getElementById('fSimbolo')) document.getElementById('fSimbolo').value=p.simbolo||'';
+  if(document.getElementById('fTitolo')) document.getElementById('fTitolo').value=p._titolo||'';
+  if(document.getElementById('fRefTitolo')) document.getElementById('fRefTitolo').value=p._refTitolo||'';
+  document.getElementById('fRefDate').value=p._refDate||'';
+  document.getElementById('v2Toggle').checked=p.v2||false;
+  document.getElementById('v2Fields').style.display=p.v2?'block':'none';
+  document.getElementById('formModeBadge').textContent='MODIFICA';
+  document.getElementById('formModeBadge').className='badge badge-yellow';
+  updateFiliazPreview(); updateRelGenitorePreview();
+  renderDB('sogg'); renderRelazioni();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function deletePersona(id){
+  if(!confirm('Eliminare la persona con id='+id+'?')) return;
+  persone=persone.filter(p=>p.id!==id);
+  if(editingId===id) resetForm();
+  renderPersone(); updateOutput();
+}
+
+function renderPersone(){
+  const c=document.getElementById('personeList');
+  document.getElementById('personeCnt').textContent=persone.length+' person'+(persone.length===1?'a':'e');
+  updatePadreSelect();
+  document.getElementById('fId').value=editingId!==null?editingId:nextId();
+  if(!persone.length){ c.innerHTML='<div class="empty-state">Nessuna persona aggiunta.</div>'; return; }
+  c.innerHTML='';
+  persone.forEach(p=>{
+    const isCapo=p.padre===-1;
+    const div=document.createElement('div'); div.className='pi'+(isCapo?' capo':'');
+    const relInfo=p.relazioni.length?' · '+p.relazioni.length+' rel.':'';
+    div.innerHTML=`
+      <span class="pid">${p.id}</span>
+      <span class="pname">${esc(stripWL(p._soggetto||p.soggetto).substring(0,36))}</span>
+      <span class="pinfo">${p.padre===-1?'capostipite':'→ '+p.padre}${relInfo}</span>
+      <div class="pactions">
+        <button class="btn btn-ghost" onclick="editPersona(${p.id})">modifica</button>
+        <button class="btn btn-ghost" style="color:var(--wp-red)" onclick="deletePersona(${p.id})">elimina</button>
+      </div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function buildCodice(){
+  if(!persone.length) return '';
+  const v2=document.getElementById('v2Toggle').checked;
+  const tipo=document.getElementById('paramTipo').value;
+  const allinea=document.getElementById('paramAllinea').value;
+  const larghezza=document.getElementById('paramLarghezza').value.trim();
+  const didascalia=document.getElementById('paramDidascalia').value.trim();
+  const align=document.getElementById('paramAlign').value;
+  let params='';
+  if(v2) params+='|v2=y';
+  if(tipo&&tipo!=='o') params+='|tipo='+tipo;
+  if(allinea==='destra'){ params+='|allinea=destra'; if(larghezza) params+='|larghezza='+larghezza; if(didascalia) params+='|didascalia='+didascalia; }
+  if(align&&align!=='') params+='|align='+align;
+  let out='{{Discendenza'+params+'\n';
+  persone.forEach(p=>{
+    const pv2=p.v2;
+    if(pv2){ out+=`|${p.id}|${p.padre}|${p.simbolo||''}|${p.soggetto}|${p.titolo||''}`; if(p.date||p.relazioni.length) out+=`|${p.date||''}`; }
+    else{ out+=`|${p.id}|${p.padre}|${p.soggetto}`; if(p.date||p.relazioni.length) out+=`|${p.date||''}`; }
+    p.relazioni.forEach(r=>{ out+=`|${r.tipo||''}|${r.ord||''}|${r.dataRel||''}|${r.correlato||''}|${r.dateCorrelato||''}`; });
+    out+='\n';
+  });
+  out+='}}';
+  return out;
+}
+
+function updateOutput(){
+  const codice=buildCodice();
+  const pre=document.getElementById('outputCode');
+  if(!codice){ pre.textContent='// Aggiungi persone per generare il codice.'; setVal([]); return; }
+  pre.textContent=codice; setVal(validatePersone());
+}
+
+function validatePersone(){
+  const errors=[];
+  const ids=persone.map(p=>p.id);
+  const capo=persone.filter(p=>p.padre===-1);
+  if(!capo.length) errors.push('Nessun capostipite. Impostare genitore = −1 per un nodo.');
+  if(capo.length>1) errors.push('Più capostipiti: '+capo.map(p=>'id='+p.id).join(', '));
+  const seen=new Set();
+  persone.forEach(p=>{
+    if(seen.has(p.id)) errors.push('ID duplicato: '+p.id);
+    seen.add(p.id);
+    if(p.padre!==-1&&!ids.includes(p.padre)) errors.push('id='+p.id+': genitore '+p.padre+' non esiste.');
+    if(p.padre===p.id) errors.push('id='+p.id+': elemento figlio di se stesso.');
+  });
+  return errors;
+}
+
+function setVal(errors){
+  const panel=document.getElementById('valPanel');
+  if(!persone.length){ panel.innerHTML='<div class="vh empty">In attesa di dati</div>'; return; }
+  if(!errors.length){ panel.innerHTML='<div class="vh ok">✓ Struttura valida</div>'; }
+  else{ panel.innerHTML='<div class="vh err">⚠ '+errors.length+' errore/i</div><div class="vi">'+errors.map(e=>'<div class="vitem">'+esc(e)+'</div>').join('')+'</div>'; }
+}
+
+function copyCode(){
+  const codice=buildCodice(); if(!codice) return;
+  navigator.clipboard.writeText(codice).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='✓ Copiato'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copia'; btn.classList.remove('copied'); },2000);
+  });
+}
+
+function clearAll(){
+  if(!confirm('Svuotare tutto l\'albero genealogico?')) return;
+  persone=[]; resetForm(); renderPersone(); updateOutput();
+}
+
+function tokenize(s){
+  const tokens=[]; let depth=0,cur='',i=0;
+  while(i<s.length){
+    const c=s[i];
+    if((c==='{'&&s[i+1]==='{')||(c==='['&&s[i+1]==='[')){ depth++; cur+=c+s[i+1]; i+=2; continue; }
+    if((c==='}'&&s[i+1]==='}')||(c===']'&&s[i+1]===']')){ depth=Math.max(0,depth-1); cur+=c+s[i+1]; i+=2; continue; }
+    if(c==='|'&&depth===0){ tokens.push(cur.trim()); cur=''; i++; continue; }
+    cur+=c; i++;
+  }
+  if(cur.trim()) tokens.push(cur.trim());
+  return tokens;
+}
+
+function parseInput(){
+  const raw=document.getElementById('parserInput').value.trim();
+  const result=document.getElementById('parserResult');
+  if(!raw){ result.innerHTML=''; return; }
+  let testo=raw.replace(/\{\{#invoke:[^|]+\|[^|]+/gi,'{{Discendenza');
+  const start=testo.indexOf('{{'),end=testo.lastIndexOf('}}');
+  if(start===-1||end===-1||end<=start){ result.innerHTML='<div class="pr error">Nessun template trovato.</div>'; return; }
+  const inner=testo.slice(start+2,end);
+  const tokens=tokenize(inner);
+  let v2=false,tipo='o',allinea='',larghezza='',didascalia='',align='';
+  tokens.forEach(t=>{ const m=t.match(/^([a-z][a-z0-9]*)\s*=\s*(.*)$/i); if(!m) return; const k=m[1].toLowerCase(),v=m[2].trim(); if(k==='v2'&&v==='y') v2=true; if(k==='tipo') tipo=v; if(k==='allinea') allinea=v; if(k==='larghezza') larghezza=v; if(k==='didascalia') didascalia=v; if(k==='align') align=v; });
+  const pos=tokens.filter(t=>{ if(!t) return false; if(t.toLowerCase()==='discendenza') return false; if(t.match(/^[a-z][a-z0-9]*\s*=/i)) return false; return true; });
+  const parsed=[]; let i=0;
+  while(i<pos.length){
+    const t0=pos[i],t1=pos[i+1];
+    if(!t0||isNaN(parseInt(t0))){ i++; continue; }
+    if(!t1||isNaN(parseInt(t1))){ i++; continue; }
+    const id=parseInt(t0),padre=parseInt(t1);
+    let simbolo='',soggetto='',titolo='',dateRaw=''; let offset;
+    if(v2){ simbolo=pos[i+2]||''; soggetto=pos[i+3]||''; titolo=pos[i+4]||''; dateRaw=pos[i+5]||''; offset=i+6; }
+    else{ soggetto=pos[i+2]||''; dateRaw=pos[i+3]||''; offset=i+4; }
+    const relazioni=[];
+    while(offset+4<pos.length){ const nx0=pos[offset],nx1=pos[offset+1]; if(!isNaN(parseInt(nx0))&&parseInt(nx0)>0&&!isNaN(parseInt(nx1))) break; relazioni.push({tipo:pos[offset]||'',ord:pos[offset+1]||'',dataRel:pos[offset+2]||'',correlato:pos[offset+3]||'',dateCorrelato:pos[offset+4]||'',_tipo:pos[offset]||'',_ord:pos[offset+1]||'',_dataRel:pos[offset+2]||'',_refDataRel:'',_correlato:pos[offset+3]||'',_refCorrelato:'',_dateCorrelato:pos[offset+4]||'',_refDateCorrelato:'',_dbCorr:[]}); offset+=5; }
+    parsed.push({id,padre,v2,soggetto,_soggetto:soggetto,_refSoggetto:'',simbolo,titolo,_titolo:titolo,_refTitolo:'',date:dateRaw,_date:dateRaw,_refDate:'',_dbSogg:[],_filiazione:'',_relGenitore:'',relazioni});
+    i=offset;
+  }
+  if(!parsed.length){ result.innerHTML='<div class="pr error">Nessuna persona riconosciuta.</div>'; return; }
+  persone=parsed;
+  document.getElementById('v2Toggle').checked=v2;
+  document.getElementById('v2Fields').style.display=v2?'block':'none';
+  document.getElementById('paramTipo').value=tipo||'o';
+  document.getElementById('paramAllinea').value=allinea||'';
+  document.getElementById('dxParams').style.display=allinea==='destra'?'grid':'none';
+  document.getElementById('paramLarghezza').value=larghezza;
+  document.getElementById('paramDidascalia').value=didascalia;
+  document.getElementById('paramAlign').value=align||'';
+  resetForm(); renderPersone(); updateOutput();
+  result.innerHTML='<div class="pr ok">✓ Importate '+parsed.length+' persone.</div>';
+}
+
+document.getElementById('v2Toggle').addEventListener('change',function(){ document.getElementById('v2Fields').style.display=this.checked?'block':'none'; updateOutput(); });
+document.getElementById('paramAllinea').addEventListener('change',function(){ document.getElementById('dxParams').style.display=this.value==='destra'?'grid':'none'; updateOutput(); });
+['paramTipo','paramLarghezza','paramDidascalia','paramAlign'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener('change',updateOutput); el.addEventListener('blur',updateOutput); } });
+
+resetForm();
+</script>
+</body>
+</html>
